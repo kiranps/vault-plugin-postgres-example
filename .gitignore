@@ -2,4 +2,3 @@ terraform.tfstate*
 .terraform.lock.hcl
 .terraform
 .direnv
-vault/data/*

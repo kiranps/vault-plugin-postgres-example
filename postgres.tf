@@ -1,41 +1,23 @@
-resource "vault_generic_endpoint" "staging_database" {
-  disable_read         = true
-  disable_delete       = true
-  ignore_absent_fields = true
-  path                 = "app-db/cluster/staging-3"
-  data_json            = <<DATA
-{
-  "host": "localhost",
-  "port": "5432",
-  "username": "postgres",
-  "password": "example",
-  "ssl_mode": "disable"
-}
-DATA
-}
-
-resource "vault_generic_endpoint" "database" {
-  path                 = "app-db/cluster/staging-3/tms"
-  data_json            = "{}"
-  ignore_absent_fields = true
-  depends_on           = [vault_generic_endpoint.staging_database]
-}
-
-resource "vault_generic_endpoint" "app_simple" {
-  disable_read         = true
-  disable_delete       = true
-  ignore_absent_fields = true
-  path                 = "app-db/roles/app"
-  data_json            = "{}"
-  depends_on           = [vault_generic_endpoint.database]
-}
-
-resource "vault_policy" "database_policy" {
-  name   = "db-tms"
-  policy = <<-POLICY
-  path "app-db/creds/staging-3/tms/app" {
-    capabilities = ["read"]
+terraform {
+  required_version = ">= 1.1.9"
+  required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = "= 3.6"
+    }
   }
-  POLICY
-  depends_on           = [vault_generic_endpoint.app_simple]
+}
+
+module "vault" {
+  source       = "./modules/vault"
+  vault_addr   = "http://127.0.0.1:8200"
+  vault_token  = "hvs.3Kk6d5BPnq34hXn60ioRgua3"
+  pg_root_pass = "example"
+}
+
+module "vault_new" {
+  source       = "./modules/vault_new"
+  vault_addr   = "http://127.0.0.1:8203"
+  vault_token  = "hvs.pzVQ4nVip4hV9TViNdjzX0NQ"
+  pg_root_pass = "00d6ae95-aa94-6004-0c85-370c729ebfb6"
 }

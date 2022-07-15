@@ -1,0 +1,5 @@
+#!/bin/bash
+rm -rf vault/data/*
+rm -rf vault_new/data/*
+rm -rf terraform.tfstate*
+docker-compose rm
